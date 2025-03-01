@@ -1,4 +1,4 @@
-package opio //nolint:typecheck
+package opio
 
 import (
 	"context"
@@ -41,4 +41,17 @@ func WithInterruptBlocker(ctx context.Context) context.Context {
 	signal.Notify(catcher.incoming, DefaultInterruptSignals...)
 
 	return context.WithValue(ctx, blockerContextKey, BlockFn(catcher.Block))
+}
+
+func BlockOnInterruptsContext(ctx context.Context, signals ...os.Signal) {
+	if len(signals) == 0 {
+		signals = DefaultInterruptSignals
+	}
+	interruptChannel := make(chan os.Signal, 1)
+	signal.Notify(interruptChannel, signals...)
+	select {
+	case <-interruptChannel:
+	case <-ctx.Done():
+		signal.Stop(interruptChannel)
+	}
 }
