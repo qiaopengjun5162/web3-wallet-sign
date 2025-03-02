@@ -9,6 +9,7 @@ repos:
       - id: check-symlinks
       - id: check-yaml
         types: [yaml]
+        exclude: ^charts/templates/.*\.yaml$
       - id: check-toml
         types: [toml]
       - id: check-json
